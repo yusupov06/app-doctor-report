@@ -7,6 +7,8 @@
         <element id="directory" name="classes">
           <element id="module-output" name="SpringMyProject" />
           <element id="jpa-descriptors" facet="SpringMyProject/jpa/JPA" />
+          <element id="module-output" name="app-doctor-report" />
+          <element id="jpa-descriptors" facet="app-doctor-report/jpa/JPA" />
         </element>
         <element id="directory" name="lib">
           <element id="library" level="project" name="Maven: org.springframework:spring-webmvc:5.3.23" />
@@ -56,6 +58,10 @@
           <element id="library" level="project" name="Maven: org.jetbrains:annotations:23.0.0" />
         </element>
       </element>
+      <element id="javaee-facet-resources" facet="app-doctor-report/web/Web" />
+      <element id="javaee-facet-resources" facet="app-doctor-report/web/Web2" />
+      <element id="javaee-facet-resources" facet="app-doctor-report/web/Web" />
+      <element id="javaee-facet-resources" facet="app-doctor-report/web/Web2" />
     </root>
   </artifact>
 </component>
