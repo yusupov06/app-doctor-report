@@ -58,8 +58,12 @@
           <element id="library" level="project" name="Maven: org.jetbrains:annotations:23.0.0" />
         </element>
       </element>
+
       <element id="javaee-facet-resources" facet="app-doctor-report/web/Web2" />
       <element id="javaee-facet-resources" facet="app-doctor-report/web/Web" />
+
+      <element id="javaee-facet-resources" facet="app-doctor-report/web/Web" />
+      <element id="javaee-facet-resources" facet="app-doctor-report/web/Web2" />
       <element id="javaee-facet-resources" facet="app-doctor-report/web/Web" />
       <element id="javaee-facet-resources" facet="app-doctor-report/web/Web2" />
     </root>

@@ -9,6 +9,9 @@
         <webroots>
           <root url="file://$MODULE_DIR$/web" relative="/" />
         </webroots>
+
+        <sourceRoots />
+
       </configuration>
     </facet>
     <facet type="web" name="Web2">
