@@ -17,4 +17,6 @@ public interface ReportService {
     List<ReportDTO> getAllByDoctor(Long currentDoctorId);
 
     List<ReportDTO> getAllByDoctorAndDates(ReportGetDTO reportGetDTO);
+
+    List<ReportCountDTO> getCountsByFrom(ReportGetDTO reportGetDTO);
 }

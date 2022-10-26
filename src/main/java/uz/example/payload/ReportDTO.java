@@ -21,15 +21,15 @@ import java.time.LocalDateTime;
 @Setter
 public class ReportDTO {
 
-    private DoctorDTO fromDoctor;
-    private String toDoctorName;
+    private DoctorDTO owner;
+    private String fromDoctorName;
     private PatientDTO patient;
 
     private String sentTime;
 
     public ReportDTO(Report report) {
-        this.fromDoctor = new DoctorDTO(report.getDoctorFrom());
-        this.toDoctorName = report.getDoctorTo();
+        this.owner = new DoctorDTO(report.getOwner());
+        this.fromDoctorName = report.getDoctorFrom();
         this.patient = new PatientDTO(report.getPatient());
 
         LocalDateTime createdAt = report.getCreatedAt();

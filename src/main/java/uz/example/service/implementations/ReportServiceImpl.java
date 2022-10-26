@@ -8,6 +8,7 @@ import uz.example.entity.Patient;
 import uz.example.entity.Report;
 import uz.example.exception.DoctorNotFoundException;
 import uz.example.payload.ReportAddDTO;
+import uz.example.payload.ReportCountDTO;
 import uz.example.payload.ReportDTO;
 import uz.example.payload.ReportGetDTO;
 import uz.example.repository.DoctorRepository;
@@ -16,6 +17,7 @@ import uz.example.service.contract.ReportService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,8 +41,8 @@ public class ReportServiceImpl implements ReportService {
     }
 
     private void fromReportDTOToReport(ReportAddDTO reportAddDTO, Report report) {
-        Long fromDoctorId = reportAddDTO.getFromDoctorId();
-        String toDoctorName = reportAddDTO.getToDoctorName();
+        Long fromDoctorId = reportAddDTO.getOwnerId();
+        String toDoctorName = reportAddDTO.getFromDoctorName();
         Doctor doctorFrom = doctorRepository.findById(fromDoctorId)
                 .orElseThrow(() -> new DoctorNotFoundException("DOCTOR NOT FOUND"));
 
@@ -54,15 +56,15 @@ public class ReportServiceImpl implements ReportService {
                 patientCity, patientStreet);
         Patient patient = new Patient(patientFullname, address);
 
-        report.setDoctorFrom(doctorFrom);
-        report.setDoctorTo(toDoctorName);
+        report.setOwner(doctorFrom);
+        report.setDoctorFrom(toDoctorName);
         report.setPatient(patient);
     }
 
     @Override
     public List<ReportDTO> getAllByDoctor(Long fromId) {
 
-        return repository.findAllByDoctorFrom_IdOrderByCreatedAtDesc(fromId)
+        return repository.findAllByOwner_IdOrderByCreatedAtDesc(fromId)
                 .stream()
                 .map(ReportDTO::new)
                 .toList();
@@ -86,11 +88,38 @@ public class ReportServiceImpl implements ReportService {
         LocalDateTime to = LocalDateTime.parse(toDate, formatter);
 
         return repository
-                .findAllByDoctorFrom_IdAndCreatedAtBetweenOrderByCreatedAtDesc(
+                .findAllByOwner_IdAndCreatedAtBetweenOrderByCreatedAtDesc(
                         reportGetDTO.getDoctorId(), from, to)
                 .stream()
                 .map(ReportDTO::new)
                 .toList();
 
+    }
+
+    @Override
+    public List<ReportCountDTO> getCountsByFrom(ReportGetDTO reportGetDTO) {
+
+        if (!doctorRepository.existsById(reportGetDTO.getDoctorId())) {
+            throw new DoctorNotFoundException("DOCTOR NOT FOUND");
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String fromDate = reportGetDTO.getFromDate();
+        fromDate = fromDate.replace("T", " ");
+
+        String toDate = reportGetDTO.getToDate();
+        toDate = toDate.replace("T", " ");
+
+        LocalDateTime from = LocalDateTime.parse(fromDate, formatter);
+        LocalDateTime to = LocalDateTime.parse(toDate, formatter);
+        List<String> allDoctors = repository.findAllDoctors(reportGetDTO.getDoctorId(), from, to);
+
+        List<ReportCountDTO> list = new ArrayList<>();
+
+        for (String allDoctor : allDoctors) {
+            Long allCount = repository.findAllCount(reportGetDTO.getDoctorId(), allDoctor, from, to);
+            list.add(new ReportCountDTO(allDoctor, allCount));
+        }
+        return list;
     }
 }

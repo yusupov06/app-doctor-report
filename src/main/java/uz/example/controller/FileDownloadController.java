@@ -16,15 +16,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.ServletContextAware;
-import uz.example.payload.DoctorDTO;
-import uz.example.payload.ReportAddDTO;
-import uz.example.payload.ReportDTO;
-import uz.example.payload.ReportGetDTO;
+import uz.example.payload.*;
 import uz.example.service.contract.DoctorService;
 import uz.example.service.contract.ReportService;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.*;
@@ -51,8 +47,10 @@ public class FileDownloadController implements ServletContextAware {
         model.addAttribute("doctor", doctor);
         model.addAttribute("reportAddDTO", new ReportAddDTO());
         List<ReportDTO> list = reportService.getAllByDoctorAndDates(reportGetDTO);
+        List<ReportCountDTO> countsByFrom = reportService.getCountsByFrom(reportGetDTO);
         createPDFAndDownload(doctor, reportGetDTO);
-        model.addAttribute("reports", list);
+        ResponseDTO responseDTO = new ResponseDTO(list, countsByFrom);
+        model.addAttribute("response", responseDTO);
         model.addAttribute("reportGet", new ReportGetDTO());
         return "home";
     }
@@ -60,18 +58,19 @@ public class FileDownloadController implements ServletContextAware {
     private void createPDFAndDownload(DoctorDTO doctor, ReportGetDTO reportGetDTO) {
 
         List<ReportDTO> list = reportService.getAllByDoctorAndDates(reportGetDTO);
+        List<ReportCountDTO> countsByFrom = reportService.getCountsByFrom(reportGetDTO);
         if (list.isEmpty()) {
             throw new NoSuchElementException("Ushbu kunlarda Hisobotlar yo'q");
         }
         try {
-            generatePDF(list, doctor.getFullname());
+            generatePDF(list, countsByFrom, doctor.getFullname());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
     }
 
-    public void generatePDF(List<ReportDTO> list, String fullname) throws IOException {
+    public void generatePDF(List<ReportDTO> list, List<ReportCountDTO> countsByFrom, String fullname) throws IOException {
 
         Document document = new Document();
         try {
@@ -99,11 +98,53 @@ public class FileDownloadController implements ServletContextAware {
 
             document.add(header);
 
+
+            PdfPTable tableForCounts = new PdfPTable(3);
+            tableForCounts.setWidthPercentage(100);
+            tableForCounts.setSpacingBefore(10f);
+            tableForCounts.setSpacingAfter(10f);
+            float[] columnWidths1 = {1f, 1f, 1f};
+            tableForCounts.setWidths(columnWidths1);
+
+            PdfPCell cell11 = new PdfPCell(new Paragraph("Tartib "));
+            cell11.setPaddingLeft(10);
+            cell11.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cell11.setVerticalAlignment(Element.ALIGN_MIDDLE);
+
+            PdfPCell cell22 = new PdfPCell(new Paragraph("Doctor ism va familiyasi "));
+            cell22.setPaddingLeft(10);
+            cell22.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cell22.setVerticalAlignment(Element.ALIGN_MIDDLE);
+
+            PdfPCell cell33 = new PdfPCell(new Paragraph(" Yuborilganlar soni "));
+            cell33.setPaddingLeft(10);
+            cell33.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cell33.setVerticalAlignment(Element.ALIGN_MIDDLE);
+
+            tableForCounts.addCell(cell11);
+            tableForCounts.addCell(cell22);
+            tableForCounts.addCell(cell33);
+
+
+            int k = 1;
+            for (ReportCountDTO reportCountDTO : countsByFrom) {
+
+                cell11 = new PdfPCell(new Paragraph(String.valueOf(k++)));
+                cell22 = new PdfPCell(new Paragraph(reportCountDTO.getFromDoctorName()));
+                cell33 = new PdfPCell(new Paragraph(String.valueOf(reportCountDTO.getReportCount())));
+
+                tableForCounts.addCell(cell11);
+                tableForCounts.addCell(cell22);
+                tableForCounts.addCell(cell33);
+
+            }
+
             PdfPTable table = new PdfPTable(5);
             table.setWidthPercentage(100);
             table.setSpacingBefore(10f);
             table.setSpacingAfter(10f);
 
+            document.add(tableForCounts);
 
             float[] columnWidths = {1f, 1f, 1f, 1f, 1f};
             table.setWidths(columnWidths);
@@ -138,11 +179,11 @@ public class FileDownloadController implements ServletContextAware {
             table.addCell(cell3);
             table.addCell(cell4);
             table.addCell(cell5);
-            int k = 1;
+            k = 1;
             for (ReportDTO reportDTO : list) {
 
                 cell1 = new PdfPCell(new Paragraph(String.valueOf(k++)));
-                cell2 = new PdfPCell(new Paragraph(reportDTO.getToDoctorName()));
+                cell2 = new PdfPCell(new Paragraph(reportDTO.getFromDoctorName()));
                 cell3 = new PdfPCell(new Paragraph(reportDTO.getPatient().getFullname()));
                 cell4 = new PdfPCell(new Paragraph(reportDTO.getPatient().getAddress()));
                 cell5 = new PdfPCell(new Paragraph(reportDTO.getSentTime()));

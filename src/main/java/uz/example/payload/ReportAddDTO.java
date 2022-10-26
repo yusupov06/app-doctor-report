@@ -17,9 +17,9 @@ import lombok.Setter;
 @Setter
 public class ReportAddDTO {
 
-    private Long fromDoctorId;
+    private Long ownerId;
 
-    private String toDoctorName;
+    private String fromDoctorName;
 
     private String patientFullname;
 

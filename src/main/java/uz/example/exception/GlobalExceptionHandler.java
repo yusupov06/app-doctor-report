@@ -21,11 +21,6 @@ import java.util.NoSuchElementException;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(SQLException.class)
-    public String handleSQLException(HttpServletRequest request, Exception ex) {
-        log.info("SQLException Occured:: URL=" + request.getRequestURL());
-        return "database_error";
-    }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = " Bu login va paroldagi Doctor topilmadi ")
     @ExceptionHandler(DoctorNotFoundException.class)

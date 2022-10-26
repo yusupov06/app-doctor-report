@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import uz.example.payload.*;
 import uz.example.service.contract.DoctorService;
 
-
 /**
  * Me: muhammadqodir
  * Project: Doctor-report-app/IntelliJ IDEA
@@ -37,7 +36,7 @@ public class AuthController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/register")
-    public String register(@Valid RegisterDTO registerDTO, Model model) {
+    public String register(@Valid RegisterDTO registerDTO) {
         doctorService.register(registerDTO);
         return "redirect:" + "login";
     }

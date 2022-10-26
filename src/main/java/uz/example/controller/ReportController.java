@@ -24,12 +24,10 @@ public class ReportController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/report/add/{from}")
     public String add(@Valid ReportAddDTO reportAddDTO, @PathVariable Long from) {
-        reportAddDTO.setFromDoctorId(from);
+        reportAddDTO.setOwnerId(from);
         reportService.add(reportAddDTO);
         return "redirect:" + "/home/" + from;
     }
-
-
 
 
 }

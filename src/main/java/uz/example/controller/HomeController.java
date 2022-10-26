@@ -32,8 +32,7 @@ public class HomeController {
         DoctorDTO doctor = doctorService.getDoctorById(currentDoctorId);
         model.addAttribute("doctor", doctor);
         model.addAttribute("reportAddDTO", new ReportAddDTO());
-        ArrayList<ReportDTO> list = new ArrayList<>();
-        model.addAttribute("reports", list);
+        model.addAttribute("response", new ResponseDTO());
         model.addAttribute("reportGet", new ReportGetDTO());
         return "home";
     }

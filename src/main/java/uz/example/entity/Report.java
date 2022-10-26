@@ -23,10 +23,10 @@ public class Report extends AbsLongTimestampEntity {
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    private Doctor doctorFrom;
+    private Doctor owner;
 
     @Column(nullable = false)
-    private String doctorTo;
+    private String doctorFrom;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(nullable = false)
